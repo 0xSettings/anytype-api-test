@@ -29,7 +29,7 @@ func (s *ContentService) Create(content *entities.Content) (*entities.Content, e
 
 func (s *ContentService) Update(id string, update *entities.Content) (*entities.Content, error) {
 	if _, ok := s.cache[id]; !ok {
-		return nil, errors.New("content not found")
+		return nil, errors.New("content not found in cache")
 	}
 	update.ID = id
 	updated, err := s.repo.UpdateContent(*update)
@@ -42,7 +42,7 @@ func (s *ContentService) Update(id string, update *entities.Content) (*entities.
 
 func (s *ContentService) Delete(id string) error {
 	if _, ok := s.cache[id]; !ok {
-		return errors.New("content not found")
+		return errors.New("content not found in cache")
 	}
 	if err := s.repo.DeleteContent(id); err != nil {
 		return err

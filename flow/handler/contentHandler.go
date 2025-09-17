@@ -52,9 +52,11 @@ func (hand *ContentHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 func (hand *ContentHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
-	if err := hand.service.Delete(id); err != nil {
+	err := hand.service.Delete(id)
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	w.WriteHeader(http.StatusNoContent)
 	w.WriteHeader(http.StatusNoContent)
 }

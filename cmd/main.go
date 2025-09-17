@@ -19,8 +19,7 @@ func main() {
 	if baseURL == "" {
 		baseURL = "http://localhost:31009/v1"
 	}
-	apiKey := os.Getenv("ANYTYPE_API_KEY") // set if needed
-	repo := repository.NewFlowRepoWithConfig(baseURL, apiKey)
+	repo := repository.NewFlowRepo()
 
 	spaceService := service.NewSpaceService(repo)
 	pageService := service.NewPageService(repo)

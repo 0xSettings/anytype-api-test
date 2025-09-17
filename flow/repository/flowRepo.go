@@ -25,4 +25,18 @@ func (r FlowRepo) ExposeNewContent(content entities.Content) error {
 	req, _ := http.NewRequest("POST", fmt.Sprintf("%s/content", r.BaseURL), bytes.NewBuffer(body))
 	req.Header.Set("Authorization", "Bearer"+r.APIKEY)
 	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+
+	response, err := client.Do(req)
+
+	if err != nil {
+		return err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode >= 400 {
+		return fmt.Errorf("failed to expose content: %v", response.Status)
+	}
+	return nil
 }

@@ -1,6 +1,12 @@
 package repository
 
-import "anytype-flow-crud/flow/entities"
+import (
+	"anytype-flow-crud/flow/entities"
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"net/http"
+)
 
 type FlowRepo struct {
 	BaseURL string
@@ -15,5 +21,8 @@ func NewFlowRepo() *FlowRepo {
 }
 
 func (r FlowRepo) ExposeNewContent(content entities.Content) error {
-
+	body, _ := json.Marshal(content)
+	req, _ := http.NewRequest("POST", fmt.Sprintf("%s/content", r.BaseURL), bytes.NewBuffer(body))
+	req.Header.Set("Authorization", "Bearer"+r.APIKEY)
+	req.Header.Set("Content-Type", "application/json")
 }

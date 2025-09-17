@@ -19,7 +19,7 @@ func NewContentHandler(ser *service.ContentService) *ContentHandler {
 	}
 }
 
-func (hand ContentHandler) Create(w http.ResponseWriter, r http.Request) {
+func (hand *ContentHandler) Create(w http.ResponseWriter, r *http.Request) {
 	var content entities.Content
 
 	if err := json.NewDecoder(r.Body).Decode(&content); err != nil {
@@ -48,9 +48,9 @@ func (hand *ContentHandler) Update(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(content)
 }
 
-func (h *ContentHandler) Delete(w http.ResponseWriter, r *http.Request) {
+func (hand *ContentHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
-	if err := h.service.Delete(id); err != nil {
+	if err := hand.service.Delete(id); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

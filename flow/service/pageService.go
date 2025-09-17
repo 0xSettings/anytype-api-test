@@ -17,7 +17,11 @@ func NewPageService(repo *repository.FlowRepo) *PageService {
 	}
 }
 
-func (s *PageService) Create(page *entities.Page) error {
-	s.cache[page.ID] = page
-	return s.repo.CreatePage(*page)
+func (s *PageService) Create(page *entities.Page) (*entities.Page, error) {
+	created, err := s.repo.CreatePage(*page)
+	if err != nil {
+		return nil, err
+	}
+	s.cache[created.ID] = created
+	return created, nil
 }

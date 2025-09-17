@@ -1,7 +1,7 @@
 package entities
 
 type Page struct {
-	ID      string `json:"id"`
-	SpaceID string `json:"space_id"`
+	ID      string `json:"id,omitempty"`
+	SpaceID string `json:"spaceId"`
 	Title   string `json:"title"`
 }

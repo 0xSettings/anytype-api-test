@@ -16,14 +16,16 @@ func NewSpaceHandler(s *service.SpaceService) *SpaceHandler {
 }
 
 func (h *SpaceHandler) Create(w http.ResponseWriter, r *http.Request) {
-	var space entities.Space
-	if err := json.NewDecoder(r.Body).Decode(&space); err != nil {
+	var req entities.Space
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	if err := h.service.Create(&space); err != nil {
+	created, err := h.service.Create(&req)
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	json.NewEncoder(w).Encode(space)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(created)
 }

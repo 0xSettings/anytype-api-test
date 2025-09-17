@@ -20,32 +20,34 @@ func NewContentHandler(ser *service.ContentService) *ContentHandler {
 }
 
 func (hand *ContentHandler) Create(w http.ResponseWriter, r *http.Request) {
-	var content entities.Content
-
-	if err := json.NewDecoder(r.Body).Decode(&content); err != nil {
+	var req entities.Content
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	if err := hand.service.Create(&content); err != nil {
+	created, err := hand.service.Create(&req)
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	json.NewEncoder(w).Encode(content)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(created)
 }
 
 func (hand *ContentHandler) Update(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
-	var content entities.Content
-	if err := json.NewDecoder(r.Body).Decode(&content); err != nil {
+	var req entities.Content
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	if err := hand.service.Update(id, &content); err != nil {
+	updated, err := hand.service.Update(id, &req)
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	json.NewEncoder(w).Encode(content)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(updated)
 }
 
 func (hand *ContentHandler) Delete(w http.ResponseWriter, r *http.Request) {

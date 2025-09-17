@@ -16,14 +16,16 @@ func NewPageHandler(s *service.PageService) *PageHandler {
 }
 
 func (h *PageHandler) Create(w http.ResponseWriter, r *http.Request) {
-	var page entities.Page
-	if err := json.NewDecoder(r.Body).Decode(&page); err != nil {
+	var req entities.Page
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	if err := h.service.Create(&page); err != nil {
+	created, err := h.service.Create(&req)
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	json.NewEncoder(w).Encode(page)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(created)
 }

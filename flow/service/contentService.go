@@ -18,22 +18,34 @@ func NewContentService(repo *repository.FlowRepo) *ContentService {
 	}
 }
 
-func (s *ContentService) Create(content *entities.Content) error {
-	s.cache[content.ID] = content
-	return s.repo.CreateContent(*content)
+func (s *ContentService) Create(content *entities.Content) (*entities.Content, error) {
+	created, err := s.repo.CreateContent(*content)
+	if err != nil {
+		return nil, err
+	}
+	s.cache[created.ID] = created
+	return created, nil
 }
 
-func (s *ContentService) Update(id string, update *entities.Content) error {
+func (s *ContentService) Update(id string, update *entities.Content) (*entities.Content, error) {
 	if _, ok := s.cache[id]; !ok {
-		return errors.New("content not found")
+		return nil, errors.New("content not found")
 	}
-	s.cache[id] = update
-	return nil
+	update.ID = id
+	updated, err := s.repo.UpdateContent(*update)
+	if err != nil {
+		return nil, err
+	}
+	s.cache[id] = updated
+	return updated, nil
 }
 
 func (s *ContentService) Delete(id string) error {
 	if _, ok := s.cache[id]; !ok {
 		return errors.New("content not found")
+	}
+	if err := s.repo.DeleteContent(id); err != nil {
+		return err
 	}
 	delete(s.cache, id)
 	return nil

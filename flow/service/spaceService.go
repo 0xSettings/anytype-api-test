@@ -17,7 +17,11 @@ func NewSpaceService(repo *repository.FlowRepo) *SpaceService {
 	}
 }
 
-func (s *SpaceService) Create(space *entities.Space) error {
-	s.cache[space.ID] = space
-	return s.repo.CreateSpace(*space)
+func (s *SpaceService) Create(space *entities.Space) (*entities.Space, error) {
+	created, err := s.repo.CreateSpace(*space)
+	if err != nil {
+		return nil, err
+	}
+	s.cache[created.ID] = created
+	return created, nil
 }

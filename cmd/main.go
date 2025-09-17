@@ -11,16 +11,24 @@ import (
 )
 
 func main() {
-
 	r := mux.NewRouter()
 
-	rep := repository.NewFlowRepo()
-	ser := service.ExposeNewContentService(rep)
-	hand := handler.NewContentHandler(ser)
+	repo := repository.NewFlowRepo()
 
-	r.HandleFunc("/api/v1/content", hand.Create).Methods("POST")
-	r.HandleFunc("/api/v1/content/{id}", hand.Update).Methods("PUT")
-	r.HandleFunc("/api/v1/content/{id}", hand.Delete).Methods("DELETE")
+	spaceService := service.NewSpaceService(repo)
+	pageService := service.NewPageService(repo)
+	contentService := service.NewContentService(repo)
+
+	spaceHandler := handler.NewSpaceHandler(spaceService)
+	pageHandler := handler.NewPageHandler(pageService)
+	contentHandler := handler.NewContentHandler(contentService)
+
+	// API routes
+	r.HandleFunc("/api/v1/spaces", spaceHandler.Create).Methods("POST")
+	r.HandleFunc("/api/v1/pages", pageHandler.Create).Methods("POST")
+	r.HandleFunc("/api/v1/content", contentHandler.Create).Methods("POST")
+	r.HandleFunc("/api/v1/content/{id}", contentHandler.Update).Methods("PUT")
+	r.HandleFunc("/api/v1/content/{id}", contentHandler.Delete).Methods("DELETE")
 
 	log.Println("Server Running on Port 8080")
 	log.Fatal(http.ListenAndServe(":8080", r))

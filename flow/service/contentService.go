@@ -7,22 +7,20 @@ import (
 )
 
 type ContentService struct {
-	rep *repository.FlowRepo
-
-	//Since API isnt supporting Update via body params
+	repo  *repository.FlowRepo
 	cache map[string]*entities.Content
 }
 
-func ExposeNewContentService(rep *repository.FlowRepo) *ContentService {
+func NewContentService(repo *repository.FlowRepo) *ContentService {
 	return &ContentService{
-		rep:   rep,
+		repo:  repo,
 		cache: make(map[string]*entities.Content),
 	}
 }
 
-func (s ContentService) Create(content *entities.Content) error {
+func (s *ContentService) Create(content *entities.Content) error {
 	s.cache[content.ID] = content
-	return s.rep.ExposeNewContent(*content)
+	return s.repo.CreateContent(*content)
 }
 
 func (s *ContentService) Update(id string, update *entities.Content) error {
@@ -38,7 +36,5 @@ func (s *ContentService) Delete(id string) error {
 		return errors.New("content not found")
 	}
 	delete(s.cache, id)
-
 	return nil
-
 }

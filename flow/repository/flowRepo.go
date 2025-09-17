@@ -15,28 +15,38 @@ type FlowRepo struct {
 
 func NewFlowRepo() *FlowRepo {
 	return &FlowRepo{
-		BaseURL: "http://localhost:3000/v1",
+		BaseURL: "http://localhost:31009/v1",
 		APIKEY:  "ud044Ju8oDxNnni/BGplsR/3LKmqKSMEuyLdvb3y6aE=",
 	}
 }
 
-func (r FlowRepo) ExposeNewContent(content entities.Content) error {
-	body, _ := json.Marshal(content)
-	req, _ := http.NewRequest("POST", fmt.Sprintf("%s/content", r.BaseURL), bytes.NewBuffer(body))
-	req.Header.Set("Authorization", "Bearer"+r.APIKEY)
+func (r FlowRepo) post(endpoint string, payload interface{}) error {
+	body, _ := json.Marshal(payload)
+	req, _ := http.NewRequest("POST", fmt.Sprintf("%s/%s", r.BaseURL, endpoint), bytes.NewBuffer(body))
+	req.Header.Set("Authorization", "Bearer "+r.APIKEY)
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
-
-	response, err := client.Do(req)
-
+	res, err := client.Do(req)
 	if err != nil {
 		return err
 	}
-	defer response.Body.Close()
+	defer res.Body.Close()
 
-	if response.StatusCode >= 400 {
-		return fmt.Errorf("failed to expose content: %v", response.Status)
+	if res.StatusCode >= 400 {
+		return fmt.Errorf("failed request %s: %v", endpoint, res.Status)
 	}
 	return nil
+}
+
+func (r FlowRepo) CreateSpace(space entities.Space) error {
+	return r.post("spaces", space)
+}
+
+func (r FlowRepo) CreatePage(page entities.Page) error {
+	return r.post("pages", page)
+}
+
+func (r FlowRepo) CreateContent(content entities.Content) error {
+	return r.post("content", content)
 }
